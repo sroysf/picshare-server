@@ -18,3 +18,12 @@ Now you can run your webapp with:
 
 (the wrapper script is not executable by default).
 
+
+# Setting up a new postgres database
+
+    sudo apt-get install postgresql
+
+Then, follow the directions here :
+
+http://www.cyberciti.biz/faq/howto-add-postgresql-user-account/
+

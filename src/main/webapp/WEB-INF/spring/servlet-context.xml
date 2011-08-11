@@ -53,18 +53,17 @@
 	
 	<!-- Drives transactions using local JPA APIs -->
 	
-	<!-- 
+ 
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
         <property name="entityManagerFactory" ref="entityManagerFactory" />
     </bean>
     
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean">
-        <property name="persistenceUnitName" value="exampleHibernateJPA" />
+        <property name="persistenceUnitName" value="picShareJPA" />
     </bean>
-    
+     
     <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
 	
-	<bean id="bookDAO" class="com.force.samples.dao.BookDAOImpl"/>
-	
-	 -->
+	<bean id="imageDAO" class="com.codechronicle.dao.ImageDAOImpl"/>
+
 </beans>
