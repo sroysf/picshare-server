@@ -4,17 +4,22 @@ import java.util.List;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-
+import redis.clients.jedis.JedisPoolConfig;
 
 public class RedisMessageQueue implements MessageQueue {
 
 	private MessageEncoder messageEncoder;
 	private JedisPool pool;
-	
+
 	public RedisMessageQueue() {
-		pool = new JedisPool("localhost", 6379);
+
+		JedisPoolConfig config = new JedisPoolConfig();
+		config.setTestOnBorrow(false);
+		pool = new JedisPool(config, System.getProperty("redisHost"),
+				Integer.parseInt(System.getProperty("redisPort")), 2000,
+				System.getProperty("redisPassword"));
 	}
-	
+
 	public MessageEncoder getMessageEncoder() {
 		return messageEncoder;
 	}
@@ -39,11 +44,12 @@ public class RedisMessageQueue implements MessageQueue {
 	public <T> T dequeue(String queueName, Class<T> clazz) {
 		Jedis jedis = pool.getResource();
 		try {
-			
+
 			// This should block until data is available
 			List<String> keyValue = jedis.blpop(0, queueName);
 			if (keyValue != null) {
-				T msg = messageEncoder.fromEncodedString(keyValue.get(1), clazz);
+				T msg = messageEncoder
+						.fromEncodedString(keyValue.get(1), clazz);
 				return msg;
 			}
 		} catch (Throwable t) {
@@ -51,7 +57,7 @@ public class RedisMessageQueue implements MessageQueue {
 		} finally {
 			pool.returnResource(jedis);
 		}
-		
+
 		return null;
 	}
 

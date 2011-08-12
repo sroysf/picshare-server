@@ -16,6 +16,7 @@ You will need to set the `REPO` environment variable, so the execution wrapper s
     export REPO=$HOME/.m2/repository
     export PORT=8080
     export DATABASE_URL='postgres://devdbuser:dbpass@localhost/devdb
+    export REDISTOGO_URL='redis://username:redispass@localhost:6379'
 
 # Run
 
