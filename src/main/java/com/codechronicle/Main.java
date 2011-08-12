@@ -23,6 +23,8 @@ public class Main {
     public static void main(String[] args) throws Exception{
         String webappDirLocation = "src/main/webapp/";
         
+        configureEnvironment();
+        
         //The port that we should run on can be set into an environment variable
         //Look for that variable and default to 8080 if it isn't there.
         String webPort = System.getenv("PORT");
@@ -49,5 +51,12 @@ public class Main {
         server.start();
         server.join();   
     }
+
+	private static void configureEnvironment() {
+		
+		String databaseURL = System.getenv().get("DATABASE_URL");
+		
+		System.setProperty("jdbcURL", databaseURL.replaceAll("postgres://(.*):(.*)@(.*)", "jdbc:postgresql://$3?user=$1&password=$2"));
+	}
 
 }

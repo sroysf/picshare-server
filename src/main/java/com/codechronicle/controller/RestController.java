@@ -1,5 +1,7 @@
 package com.codechronicle.controller;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -42,6 +44,11 @@ public class RestController {
 		String origUrl   = "https://homenas/nas/media/Pictures/2010/150.Kai%20Sept/DSC_6494.JPG";
 
 		// Check to see if we have this already. If we do, just retrieve the record and send it back.
+		List<Image> existingImages = imageDAO.findByOrigUrl(origUrl);
+		if (existingImages.size() > 0) {
+			return existingImages.get(0);
+		}
+		
 		// Otherwise, create a new image, save the record, and then queue up post processing.
 		Image image = new Image();
 		image.setLocalPath(localPath);

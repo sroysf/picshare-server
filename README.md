@@ -8,7 +8,9 @@ Build the project with
 
 You will need to set the `REPO` environment variable, so the execution wrapper script knows where to find the maven dependencies. For example:
 
-    $ export REPO=$HOME/.m2/repository
+    export REPO=$HOME/.m2/repository
+    export PORT=8080
+    export DATABASE_URL='postgres://devdbuser:dbpass@localhost/devdb
 
 # Run
 
@@ -25,5 +27,5 @@ Now you can run your webapp with:
 
 Then, follow the directions here :
 
-http://www.cyberciti.biz/faq/howto-add-postgresql-user-account/
+    http://www.cyberciti.biz/faq/howto-add-postgresql-user-account/
 

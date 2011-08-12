@@ -14,6 +14,8 @@ public class Image {
 	private String localPath;
 	private String thumbUrl;
 	private String webUrl;
+	
+	// This field should be indexed in the database for performance, since we frequently look things up by this.
 	private String originalUrl;
 	
 	private boolean postProcessed = false;
