@@ -46,28 +46,6 @@
 		<property name="defaultContentType" value="application/json" />
 	</bean>
 	
-	<context:component-scan base-package="com.codechronicle" />
+	<import resource="classpath:appContext.xml"/>
 	
-	<!-- Persistence infrastructure -->
-	<tx:annotation-driven />
-	
-	<!-- Drives transactions using local JPA APIs -->
-	
- 
-    <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
-        <property name="entityManagerFactory" ref="entityManagerFactory" />
-    </bean>
-    
-    <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalEntityManagerFactoryBean">
-        <property name="persistenceUnitName" value="picShareJPA" />
-    </bean>
-     
-    <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
-	
-	<bean id="imageDAO" class="com.codechronicle.dao.ImageDAOImpl"/>
-	
-	<!-- Message queue configuration -->
-	<bean id="messageEncoder" class="com.codechronicle.messaging.JSONMessageEncoder"/>
-	<bean id="messageQueue" class="com.codechronicle.messaging.RedisMessageQueue" />
-
 </beans>

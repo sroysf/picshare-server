@@ -178,6 +178,10 @@
                             <mainClass>com.codechronicle.Main</mainClass>
                             <name>webapp</name>
                         </program>
+                        <program>
+                            <mainClass>com.codechronicle.worker.ImagePostProcessor</mainClass>
+                            <name>imageWorker</name>
+                        </program>
                     </programs>
                 </configuration>
                 <executions>
