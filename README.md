@@ -1,3 +1,8 @@
+# Prerequisites
+
+- Local Postgres database, with corresponding database and user account matching DATABASE_URL
+- Local Redis server, used for message queueing.
+
 # Build
 
 Build the project with

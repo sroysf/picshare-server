@@ -1,0 +1,7 @@
+Example for worker threads:
+
+https://github.com/jsimone/ProcessModelDemo/blob/master/pom.xml
+
+- Add jeddis queueing of message
+- Add worker process that reads from queue
+- Refactor it out into simple to use redis queue infrastructure

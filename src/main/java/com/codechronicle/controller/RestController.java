@@ -2,6 +2,7 @@ package com.codechronicle.controller;
 
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.codechronicle.dao.ImageDAO;
 import com.codechronicle.entity.Book;
 import com.codechronicle.entity.Image;
+import com.codechronicle.messaging.AsyncMessage;
+import com.codechronicle.messaging.MessageQueue;
 
 @Controller
 @RequestMapping(value="/rest")
@@ -25,6 +28,9 @@ public class RestController {
 
 	@Inject
 	private ImageDAO imageDAO;
+	
+	@Resource(name="messageQueue")	
+	private MessageQueue messageQueue;
 	
 	@RequestMapping(method=RequestMethod.GET, value="/book/{bookId}")
 	public @ResponseBody Book getBook (@PathVariable(value="bookId") long bookId, Model model) {
@@ -37,8 +43,18 @@ public class RestController {
 		return book;
 	}
 	
+	@RequestMapping(method=RequestMethod.GET, value="/msg")
+	public @ResponseBody AsyncMessage getMessage () {
+		return messageQueue.dequeue("testQueue", AsyncMessage.class);
+	}
+	
 	@RequestMapping(method=RequestMethod.GET, value="/image")
 	public @ResponseBody Image postSingleImage () {
+		
+		String name = "Name." + ((int)(Math.random() * 1000));
+		int age = ((int)(Math.random() * 100));
+		AsyncMessage msg = new AsyncMessage(name, age);
+		messageQueue.enqueue("testQueue", msg);
 		
 		String localPath = "/home/sroy/temp/ajcook.jpg";
 		String origUrl   = "https://homenas/nas/media/Pictures/2010/150.Kai%20Sept/DSC_6494.JPG";
