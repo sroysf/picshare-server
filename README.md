@@ -14,8 +14,7 @@ Build the project with
 You will need to set the `REPO` environment variable, so the execution wrapper script knows where to find the maven dependencies. For example:
 
     export REPO=$HOME/.m2/repository
-    export PORT=8080
-    export DATABASE_URL='postgres://devdbuser:dbpass@localhost/devdb
+    export DATABASE_URL='postgres://devdbuser:dbpass@localhost/devdb'
     export REDISTOGO_URL='redis://username:redispass@localhost:6379'
 
 # Run
