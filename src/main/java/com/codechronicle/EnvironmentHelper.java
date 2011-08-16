@@ -1,5 +1,8 @@
 package com.codechronicle;
 
+import java.net.URI;
+import java.net.URISyntaxException;
+
 public class EnvironmentHelper {
 	
 	public static void configureEnvironment() {
@@ -32,6 +35,14 @@ public class EnvironmentHelper {
 			throw new RuntimeException("Unable to start. Requires env var DATABASE_URL to be set.");
 		}
 
+		URI dbURI = null;
+		
+		try {
+			dbURI = new URI(databaseURL);
+		} catch (URISyntaxException e) {
+			throw new RuntimeException("DATABASE_URL must be in proper URI format");
+		}
+		
 		System.setProperty("jdbcURL", databaseURL.replaceAll(
 				"postgres://(.*):(.*)@(.*)",
 				"jdbc:postgresql://$3?user=$1&password=$2"));

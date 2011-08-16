@@ -142,6 +142,13 @@
 			</exclusions>
 			<scope>runtime</scope>
 		</dependency>
+		
+		<!-- Http access to remote resources -->
+		<dependency>
+		    <groupId>org.apache.httpcomponents</groupId>
+		    <artifactId>httpclient</artifactId>
+		    <version>4.1.2</version>
+		</dependency>
 
 		<!-- Test only dependencies -->
 		<dependency>
