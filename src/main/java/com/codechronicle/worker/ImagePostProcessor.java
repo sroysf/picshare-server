@@ -63,7 +63,7 @@ public class ImagePostProcessor {
 		while (true) {
 			i++;
 			ProcessImageMessage msg = messageQueue.dequeue(EnvironmentHelper.PROCESS_IMAGE_QUEUE, ProcessImageMessage.class);
-			System.out.println("Got message #" + i + ", image id = " + msg.getImageId());
+			log.info("Got message #" + i + ", image id = " + msg.getImageId());
 			processImage(msg.getImageId(), msg.isHostOriginal());
 		}
 	}
@@ -83,7 +83,14 @@ public class ImagePostProcessor {
 		
 		String url = image.getOriginalUrl();
 		
-		File srcImageFile = copyImageFromURL(url);
+		File srcImageFile = null;
+		
+		if ((image.getLocalPath() != null) && (image.getLocalPath().length() > 0)) {
+			srcImageFile = copyImageFromLocalFile(image.getLocalPath());
+		} else {
+			srcImageFile = copyImageFromURL(url);
+		}
+		
 		File webImageFile = createWebImage(srcImageFile);
 		File thumbImageFile = createThumbImage(srcImageFile);
 		
@@ -107,8 +114,9 @@ public class ImagePostProcessor {
 			image.setPostProcessed(true);
 			imageDAO.saveOrUpdate(image);
 			
-			System.out.println("Web image = " + webImageURL);
-			System.out.println("Thumb image = " + thumbImageURL);
+			log.info("Master image = " + masterImageURL);
+			log.info("Web image = " + webImageURL);
+			log.info("Thumb image = " + thumbImageURL);
 			
 		} finally {
 			srcImageFile.delete();
@@ -119,7 +127,7 @@ public class ImagePostProcessor {
 
 	private File createMasterImage(File srcImage) {
 		File targetFile = new File(srcImage.getAbsolutePath() + ".master.jpg");
-		System.out.println("Creating master file : " + targetFile.getAbsolutePath());
+		log.info("Creating master file : " + targetFile.getAbsolutePath());
 		convertImage(srcImage, targetFile);
 		
 		return targetFile;
@@ -127,7 +135,7 @@ public class ImagePostProcessor {
 	
 	private File createWebImage(File srcImage) {
 		File targetFile = new File(srcImage.getAbsolutePath() + ".web.jpg");
-		System.out.println("Creating web file : " + targetFile.getAbsolutePath());
+		log.info("Creating web file : " + targetFile.getAbsolutePath());
 		resizeImage(srcImage, targetFile, "1024x768");
 		
 		return targetFile;
@@ -135,7 +143,7 @@ public class ImagePostProcessor {
 	
 	private File createThumbImage(File srcImage) {
 		File targetFile = new File(srcImage.getAbsolutePath() + ".thumb.jpg");
-		System.out.println("Creating web file : " + targetFile.getAbsolutePath());
+		log.info("Creating web file : " + targetFile.getAbsolutePath());
 		resizeImage(srcImage, targetFile, "200x200");
 
 		return targetFile;
@@ -170,6 +178,27 @@ public class ImagePostProcessor {
 		}
 	}
 
+	private File copyImageFromLocalFile(String localPath) {
+		
+		File tmpFile = null;
+		try {
+			File srcFile = new File(localPath);
+			if (!srcFile.exists()) {
+				throw new RuntimeException("Local file not found : " + localPath);
+			}
+			
+			do {
+				tmpFile = File.createTempFile("picshare", "");
+			} while (!tmpFile.exists());
+			
+			log.info("Copying local file from " + srcFile.getAbsolutePath() + " --> " + tmpFile.getAbsolutePath());
+			FileUtils.copyFile(srcFile, tmpFile);
+		} catch (Throwable e) {
+			throw new RuntimeException(e);
+		}
+		
+		return tmpFile;
+	}
 
 	private File copyImageFromURL(String url) {
 		
@@ -185,6 +214,8 @@ public class ImagePostProcessor {
 					tmpFile = File.createTempFile("picshare", "");
 				} while (!tmpFile.exists());
 			    InputStream instream = entity.getContent();
+			    
+			    log.info("Downloading file from " + url + " --> " + tmpFile.getAbsolutePath());
 			    FileUtils.copyInputStreamToFile(instream, tmpFile);
 			}
 		} catch (Throwable e) {

@@ -42,6 +42,9 @@ public class RedisMessageQueue implements MessageQueue {
 
 	@Override
 	public <T> T dequeue(String queueName, Class<T> clazz) {
+		
+		// TODO: Add reconnect capability if server closes connection due to blocking for too long
+		
 		Jedis jedis = pool.getResource();
 		try {
 

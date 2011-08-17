@@ -53,20 +53,25 @@ public class RestController {
 	@RequestMapping(method=RequestMethod.GET, value="/image")
 	public @ResponseBody Image postSingleImage () {
 		
-		String origUrl = "http://www.citypictures.net/data/media/227/Monch_and_Eiger_Grosse_Scheidegg_Switzerland.jpg";
+		String localPath = "/tmp/DSC_6420.JPG";
+		String origUrl = "http://saptarshi.homedns.org/nas/pics/kai.jpg";
+		
+		//String origUrl = "http://www.citypictures.net/data/media/227/Monch_and_Eiger_Grosse_Scheidegg_Switzerland.jpg";
 		//String origUrl = "http://www.zastavki.com/pictures/1024x768/2008/Movies_Movies_U_Underworld__Evolution_010690_.jpg";
 
+		// ************* END artificial setup ****************
+		
 		// Check to see if we have this already. If we do, just retrieve the record and send it back.
 		List<Image> existingImages = imageDAO.findByOrigUrl(origUrl);
 		if (existingImages.size() > 0) {
 			Image existingImage = existingImages.get(0);
 			log.info("Requested image already in database, id = " + existingImage.getId() + ", original URL = " + existingImage.getOriginalUrl());
-			return existingImages.get(0);
+			return existingImage;
 		}
 		
 		// Otherwise, create a new image, save the record, and then queue up post processing.
 		Image image = new Image();
-		image.setLocalPath(null);
+		image.setLocalPath(localPath);
 		image.setOriginalUrl(origUrl);
 		image = imageDAO.saveOrUpdate(image);
 		
