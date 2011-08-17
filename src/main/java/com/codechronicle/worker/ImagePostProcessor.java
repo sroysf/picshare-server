@@ -1,60 +1,88 @@
 package com.codechronicle.worker;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 
+import javax.inject.Inject;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
+import org.springframework.stereotype.Service;
 
 import com.codechronicle.EnvironmentHelper;
-import com.codechronicle.messaging.AsyncMessage;
+import com.codechronicle.dao.ImageDAO;
+import com.codechronicle.entity.Image;
 import com.codechronicle.messaging.MessageQueue;
+import com.codechronicle.messaging.ProcessImageMessage;
 import com.codechronicle.storage.PersistentStoreProvider;
 
+@Service
 public class ImagePostProcessor {
 	
 	private static ApplicationContext context = null;
+	private static Logger log = LoggerFactory.getLogger(ImagePostProcessor.class);
 
-	public static void mainX(String[] args) {
+	@Inject
+	private ImageDAO imageDAO;
+	
+	@Inject
+	MessageQueue messageQueue;
+	
+	public static void main(String[] args) {
 
 		EnvironmentHelper.configureEnvironment();
 
 		context = new ClassPathXmlApplicationContext("appContext.xml");
-
-		MessageQueue queue = context.getBean("messageQueue", MessageQueue.class);
-
-		// TODO: Wire up real image requests that call processImage()
-		// TODO: Add option in message to specify a local source file. 
-		//		 Must include hosting URL to point at original. This very simply delegates the security issue to the browser.
 		
+		ImagePostProcessor imgProcessor = context.getBean("imagePostProcessor", ImagePostProcessor.class);
+		imgProcessor.listenForMessages();
+		
+		/*Image image = new Image();
+		image.setOriginalUrl("http://www.citypictures.net/data/media/227/Monch_and_Eiger_Grosse_Scheidegg_Switzerland.jpg");
+		ImageDAO imgDAO = context.getBean("imageDAO", ImageDAO.class);
+		imgDAO.saveOrUpdate(image);
+		
+		*/
+		
+		//imgProcessor.processImage(2l);
+		
+	}
+	
+	private void listenForMessages() {
 		int i=0;
 		while (true) {
 			i++;
-			AsyncMessage msg = queue.dequeue("testQueue", AsyncMessage.class);
-			System.out.println("Got message #" + i + " -> " + msg);
+			ProcessImageMessage msg = messageQueue.dequeue(EnvironmentHelper.PROCESS_IMAGE_QUEUE, ProcessImageMessage.class);
+			System.out.println("Got message #" + i + ", image id = " + msg.getImageId());
+			processImage(msg.getImageId());
 		}
 	}
 	
-	public static void main(String[] args) {
-		EnvironmentHelper.configureEnvironment();
+	private void processImage(long imageId) {
 
-		context = new ClassPathXmlApplicationContext("appContext.xml");
+		Image image = imageDAO.findById(imageId);
 		
-		processImage("http://www.citypictures.net/data/media/227/Monch_and_Eiger_Grosse_Scheidegg_Switzerland.jpg");
-	}
-	
-	private static void processImage(String url) {
-
+		if (image == null) {
+			throw new RuntimeException("Unable to locate image with id = " + imageId + " in database.");
+		}
+		
+		if (image.isPostProcessed()) {
+			log.warn("Request to process image id = " + imageId + ", but image has already post processed. Update database status to force reprocessing");
+			return;
+		}
+		
+		String url = image.getOriginalUrl();
+		
 		File srcImageFile = copyImageFromURL(url);
 		File webImageFile = createWebImage(srcImageFile);
 		File thumbImageFile = createThumbImage(srcImageFile);
@@ -65,6 +93,10 @@ public class ImagePostProcessor {
 			URL thumbImageURL = storeProvider.persistFile(thumbImageFile);
 			
 			// TODO: Wire up actual database updates that update record with web and thumb URL's
+			image.setWebUrl(webImageURL.toString());
+			image.setThumbUrl(thumbImageURL.toString());
+			image.setPostProcessed(true);
+			imageDAO.saveOrUpdate(image);
 			
 			System.out.println("Web image = " + webImageURL);
 			System.out.println("Thumb image = " + thumbImageURL);
@@ -77,7 +109,7 @@ public class ImagePostProcessor {
 	}
 
 
-	private static File createWebImage(File srcImage) {
+	private File createWebImage(File srcImage) {
 		File targetFile = new File(srcImage.getAbsolutePath() + ".web.jpg");
 		System.out.println("Creating web file : " + targetFile.getAbsolutePath());
 		resizeImage(srcImage, targetFile, "1024x768");
@@ -85,7 +117,7 @@ public class ImagePostProcessor {
 		return targetFile;
 	}
 	
-	private static File createThumbImage(File srcImage) {
+	private File createThumbImage(File srcImage) {
 		File targetFile = new File(srcImage.getAbsolutePath() + ".thumb.jpg");
 		System.out.println("Creating web file : " + targetFile.getAbsolutePath());
 		resizeImage(srcImage, targetFile, "200x200");
@@ -94,7 +126,7 @@ public class ImagePostProcessor {
 	}
 
 
-	private static void resizeImage(File srcImage, File targetFile, String dimensions) {
+	private void resizeImage(File srcImage, File targetFile, String dimensions) {
 		
 		String cmdLine = "/usr/bin/convert " + srcImage.getAbsolutePath() + " -resize " + dimensions + " " + targetFile.getAbsolutePath();
 		try {
@@ -115,7 +147,7 @@ public class ImagePostProcessor {
 	}
 
 
-	private static File copyImageFromURL(String url) {
+	private File copyImageFromURL(String url) {
 		
 		File tmpFile = null;
 		try {

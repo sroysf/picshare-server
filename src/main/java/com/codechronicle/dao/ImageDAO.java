@@ -8,4 +8,6 @@ public interface ImageDAO {
 	Image saveOrUpdate (Image image);
 	
 	List<Image> findByOrigUrl(String url);
+	
+	Image findById(long id);
 }

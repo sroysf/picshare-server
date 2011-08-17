@@ -43,5 +43,7 @@
 	<bean id="storageProvider" class="com.codechronicle.storage.LocalDiskPersistentStoreProvider">
 		<constructor-arg><value>#{systemEnvironment['STORAGE_DIRECTORY']}</value></constructor-arg>
 	</bean>
+	
+	<bean id="imagePostProcessor" class="com.codechronicle.worker.ImagePostProcessor"/>
 
 </beans>

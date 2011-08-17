@@ -1,42 +1,23 @@
 package com.codechronicle.messaging;
 
 import java.io.Serializable;
+import java.util.Date;
 
 public class AsyncMessage implements Serializable {
 	
 	private static final long serialVersionUID = 1L;
 	
-	private String name;
-	private int age;
+	private Date timeStamp;
 	
 	public AsyncMessage() {
-	}
-	
-	public AsyncMessage(String name, int age) {
-		super();
-		this.name = name;
-		this.age = age;
+		timeStamp = new Date();
 	}
 
-	public String getName() {
-		return name;
+	public Date getTimeStamp() {
+		return timeStamp;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setTimeStamp(Date timeStamp) {
+		this.timeStamp = timeStamp;
 	}
-
-	public int getAge() {
-		return age;
-	}
-
-	public void setAge(int age) {
-		this.age = age;
-	}
-	
-	@Override
-	public String toString() {
-		return name + " : " + age;
-	}
-	
 }

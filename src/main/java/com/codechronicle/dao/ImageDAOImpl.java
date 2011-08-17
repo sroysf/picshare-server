@@ -22,6 +22,8 @@ public class ImageDAOImpl extends JpaDaoSupport implements ImageDAO {
 		
 		if (image.getId() == null) {
 			getJpaTemplate().persist(image);
+		} else {
+			getJpaTemplate().merge(image);
 		}
 		
 		return image;
@@ -36,4 +38,8 @@ public class ImageDAOImpl extends JpaDaoSupport implements ImageDAO {
 		return images;
 	}
 
+	@Override
+	public Image findById(long id) {
+		return getJpaTemplate().find(Image.class, id);
+	}
 }

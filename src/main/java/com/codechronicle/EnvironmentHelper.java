@@ -5,6 +5,8 @@ import java.net.URISyntaxException;
 
 public class EnvironmentHelper {
 	
+	public static final String PROCESS_IMAGE_QUEUE = "processImageQueue";
+	
 	public static void configureEnvironment() {
 
 		configurePostgres();

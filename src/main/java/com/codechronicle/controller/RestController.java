@@ -14,11 +14,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.codechronicle.EnvironmentHelper;
 import com.codechronicle.dao.ImageDAO;
 import com.codechronicle.entity.Book;
 import com.codechronicle.entity.Image;
 import com.codechronicle.messaging.AsyncMessage;
 import com.codechronicle.messaging.MessageQueue;
+import com.codechronicle.messaging.ProcessImageMessage;
 
 @Controller
 @RequestMapping(value="/rest")
@@ -32,7 +34,7 @@ public class RestController {
 	@Resource(name="messageQueue")	
 	private MessageQueue messageQueue;
 	
-	@RequestMapping(method=RequestMethod.GET, value="/book/{bookId}")
+	/*@RequestMapping(method=RequestMethod.GET, value="/book/{bookId}")
 	public @ResponseBody Book getBook (@PathVariable(value="bookId") long bookId, Model model) {
 		
 		log.info("Searching for book with id = " + bookId);
@@ -41,36 +43,36 @@ public class RestController {
 		book.setName("Fellowship of the Ring");
 		
 		return book;
-	}
+	}*/
 	
-	@RequestMapping(method=RequestMethod.GET, value="/msg")
+	/*@RequestMapping(method=RequestMethod.GET, value="/msg")
 	public @ResponseBody AsyncMessage getMessage () {
 		return messageQueue.dequeue("testQueue", AsyncMessage.class);
-	}
+	}*/
 	
 	@RequestMapping(method=RequestMethod.GET, value="/image")
 	public @ResponseBody Image postSingleImage () {
 		
-		String name = "Name." + ((int)(Math.random() * 1000));
-		int age = ((int)(Math.random() * 100));
-		AsyncMessage msg = new AsyncMessage(name, age);
-		messageQueue.enqueue("testQueue", msg);
-		
-		String localPath = "/home/sroy/temp/ajcook.jpg";
-		String origUrl   = "https://homenas/nas/media/Pictures/2010/150.Kai%20Sept/DSC_6494.JPG";
+		//String origUrl = "http://www.citypictures.net/data/media/227/Monch_and_Eiger_Grosse_Scheidegg_Switzerland.jpg";
+		String origUrl = "http://www.zastavki.com/pictures/1024x768/2008/Movies_Movies_U_Underworld__Evolution_010690_.jpg";
 
 		// Check to see if we have this already. If we do, just retrieve the record and send it back.
 		List<Image> existingImages = imageDAO.findByOrigUrl(origUrl);
 		if (existingImages.size() > 0) {
+			Image existingImage = existingImages.get(0);
+			log.info("Requested image already in database, id = " + existingImage.getId() + ", original URL = " + existingImage.getOriginalUrl());
 			return existingImages.get(0);
 		}
 		
 		// Otherwise, create a new image, save the record, and then queue up post processing.
 		Image image = new Image();
-		image.setLocalPath(localPath);
+		image.setLocalPath(null);
 		image.setOriginalUrl(origUrl);
-		
 		image = imageDAO.saveOrUpdate(image);
+		
+		ProcessImageMessage msg = new ProcessImageMessage();
+		msg.setImageId(image.getId());
+		messageQueue.enqueue(EnvironmentHelper.PROCESS_IMAGE_QUEUE, msg);
 		
 		return image;
 	}
