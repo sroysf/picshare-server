@@ -4,6 +4,7 @@ package com.codechronicle.messaging;
 public class ProcessImageMessage extends AsyncMessage {
 	
 	private long imageId;
+	private boolean hostOriginal = false;
 	
 	public ProcessImageMessage() {
 	}
@@ -16,4 +17,11 @@ public class ProcessImageMessage extends AsyncMessage {
 		this.imageId = imageId;
 	}
 
+	public boolean isHostOriginal() {
+		return hostOriginal;
+	}
+
+	public void setHostOriginal(boolean hostOriginal) {
+		this.hostOriginal = hostOriginal;
+	}
 }

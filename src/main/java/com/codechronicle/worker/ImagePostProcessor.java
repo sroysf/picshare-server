@@ -64,11 +64,11 @@ public class ImagePostProcessor {
 			i++;
 			ProcessImageMessage msg = messageQueue.dequeue(EnvironmentHelper.PROCESS_IMAGE_QUEUE, ProcessImageMessage.class);
 			System.out.println("Got message #" + i + ", image id = " + msg.getImageId());
-			processImage(msg.getImageId());
+			processImage(msg.getImageId(), msg.isHostOriginal());
 		}
 	}
 	
-	private void processImage(long imageId) {
+	private void processImage(long imageId, boolean hostOriginal) {
 
 		Image image = imageDAO.findById(imageId);
 		
@@ -91,10 +91,19 @@ public class ImagePostProcessor {
 			PersistentStoreProvider storeProvider = context.getBean("storageProvider", PersistentStoreProvider.class);
 			URL webImageURL = storeProvider.persistFile(webImageFile);
 			URL thumbImageURL = storeProvider.persistFile(thumbImageFile);
+			String masterImageURL = null;
+			
+			if (hostOriginal) {
+				File masterImageFile = createMasterImage(srcImageFile);
+				masterImageURL = storeProvider.persistFile(masterImageFile).toString();
+			} else {
+				masterImageURL = image.getOriginalUrl();
+			}
 			
 			// TODO: Wire up actual database updates that update record with web and thumb URL's
 			image.setWebUrl(webImageURL.toString());
 			image.setThumbUrl(thumbImageURL.toString());
+			image.setMasterUrl(masterImageURL);
 			image.setPostProcessed(true);
 			imageDAO.saveOrUpdate(image);
 			
@@ -108,7 +117,14 @@ public class ImagePostProcessor {
 		}
 	}
 
-
+	private File createMasterImage(File srcImage) {
+		File targetFile = new File(srcImage.getAbsolutePath() + ".master.jpg");
+		System.out.println("Creating master file : " + targetFile.getAbsolutePath());
+		convertImage(srcImage, targetFile);
+		
+		return targetFile;
+	}
+	
 	private File createWebImage(File srcImage) {
 		File targetFile = new File(srcImage.getAbsolutePath() + ".web.jpg");
 		System.out.println("Creating web file : " + targetFile.getAbsolutePath());
@@ -126,9 +142,17 @@ public class ImagePostProcessor {
 	}
 
 
+	private void convertImage(File srcImage, File targetFile) {
+		String cmdLine = "/usr/bin/convert " + srcImage.getAbsolutePath() + " " + targetFile.getAbsolutePath();
+		executeCommandLine(targetFile, cmdLine);
+	}
+	
 	private void resizeImage(File srcImage, File targetFile, String dimensions) {
-		
 		String cmdLine = "/usr/bin/convert " + srcImage.getAbsolutePath() + " -resize " + dimensions + " " + targetFile.getAbsolutePath();
+		executeCommandLine(targetFile, cmdLine);
+	}
+
+	private void executeCommandLine(File targetFile, String cmdLine) {
 		try {
 			Process proc = Runtime.getRuntime().exec(cmdLine);
 			int exitCode = proc.waitFor();

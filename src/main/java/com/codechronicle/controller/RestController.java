@@ -53,8 +53,8 @@ public class RestController {
 	@RequestMapping(method=RequestMethod.GET, value="/image")
 	public @ResponseBody Image postSingleImage () {
 		
-		//String origUrl = "http://www.citypictures.net/data/media/227/Monch_and_Eiger_Grosse_Scheidegg_Switzerland.jpg";
-		String origUrl = "http://www.zastavki.com/pictures/1024x768/2008/Movies_Movies_U_Underworld__Evolution_010690_.jpg";
+		String origUrl = "http://www.citypictures.net/data/media/227/Monch_and_Eiger_Grosse_Scheidegg_Switzerland.jpg";
+		//String origUrl = "http://www.zastavki.com/pictures/1024x768/2008/Movies_Movies_U_Underworld__Evolution_010690_.jpg";
 
 		// Check to see if we have this already. If we do, just retrieve the record and send it back.
 		List<Image> existingImages = imageDAO.findByOrigUrl(origUrl);
@@ -72,6 +72,7 @@ public class RestController {
 		
 		ProcessImageMessage msg = new ProcessImageMessage();
 		msg.setImageId(image.getId());
+		msg.setHostOriginal(false);
 		messageQueue.enqueue(EnvironmentHelper.PROCESS_IMAGE_QUEUE, msg);
 		
 		return image;

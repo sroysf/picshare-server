@@ -14,6 +14,7 @@ public class Image {
 	private String localPath;
 	private String thumbUrl;
 	private String webUrl;
+	private String masterUrl;
 	
 	// This field should be indexed in the database for performance, since we frequently look things up by this.
 	private String originalUrl;
@@ -56,5 +57,11 @@ public class Image {
 	}
 	public void setPostProcessed(boolean postProcessed) {
 		this.postProcessed = postProcessed;
+	}
+	public String getMasterUrl() {
+		return masterUrl;
+	}
+	public void setMasterUrl(String masterUrl) {
+		this.masterUrl = masterUrl;
 	}
 }

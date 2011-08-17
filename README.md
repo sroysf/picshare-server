@@ -35,3 +35,6 @@ Then, follow the directions here :
 
     http://www.cyberciti.biz/faq/howto-add-postgresql-user-account/
 
+# Generating schema
+
+	mvn hibernate3:hbm2ddl
