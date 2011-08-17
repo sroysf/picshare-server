@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.http.HttpEntity;
@@ -12,21 +13,25 @@ import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
 import com.codechronicle.EnvironmentHelper;
 import com.codechronicle.messaging.AsyncMessage;
 import com.codechronicle.messaging.MessageQueue;
+import com.codechronicle.storage.PersistentStoreProvider;
 
 public class ImagePostProcessor {
+	
+	private static ApplicationContext context = null;
 
-	public static void main(String[] args) {
+	public static void mainX(String[] args) {
 
 		EnvironmentHelper.configureEnvironment();
 
-		ClassPathXmlApplicationContext ctx = new ClassPathXmlApplicationContext("appContext.xml");
+		context = new ClassPathXmlApplicationContext("appContext.xml");
 
-		MessageQueue queue = ctx.getBean("messageQueue", MessageQueue.class);
+		MessageQueue queue = context.getBean("messageQueue", MessageQueue.class);
 
 		// TODO: Wire up real image requests that call processImage()
 		// TODO: Add option in message to specify a local source file. 
@@ -40,19 +45,35 @@ public class ImagePostProcessor {
 		}
 	}
 	
-	public static void example() {
-		processImage("https://picasaweb.google.com/102738096689107661272/AustriaParagliding#5627286372394737378");
+	public static void main(String[] args) {
+		EnvironmentHelper.configureEnvironment();
+
+		context = new ClassPathXmlApplicationContext("appContext.xml");
+		
+		processImage("http://www.citypictures.net/data/media/227/Monch_and_Eiger_Grosse_Scheidegg_Switzerland.jpg");
 	}
 	
 	private static void processImage(String url) {
 
 		File srcImageFile = copyImageFromURL(url);
-		createWebImage(srcImageFile);
-		createThumbImage(srcImageFile);
+		File webImageFile = createWebImage(srcImageFile);
+		File thumbImageFile = createThumbImage(srcImageFile);
 		
-		// TODO: Push the derived artifacts to permanent storage (like S3)
-		// TODO: Wire up actual database updates that update record with web and thumb URL's
-		// TODO: Delete temp image files
+		try {
+			PersistentStoreProvider storeProvider = context.getBean("storageProvider", PersistentStoreProvider.class);
+			URL webImageURL = storeProvider.persistFile(webImageFile);
+			URL thumbImageURL = storeProvider.persistFile(thumbImageFile);
+			
+			// TODO: Wire up actual database updates that update record with web and thumb URL's
+			
+			System.out.println("Web image = " + webImageURL);
+			System.out.println("Thumb image = " + thumbImageURL);
+			
+		} finally {
+			srcImageFile.delete();
+			webImageFile.delete();
+			thumbImageFile.delete();
+		}
 	}
 
 

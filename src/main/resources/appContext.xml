@@ -35,5 +35,13 @@
 	<!-- Message queue configuration -->
 	<bean id="messageEncoder" class="com.codechronicle.messaging.JSONMessageEncoder"/>
 	<bean id="messageQueue" class="com.codechronicle.messaging.RedisMessageQueue" />
+	
+	<!-- Storage configuration -->
+	<!--  TODO: How do you make this dynamic based on an environment variable? I may want to switch out different providers
+				in different environments. For example, sometimes I might want to push to Amazon instead of local disk.
+	-->
+	<bean id="storageProvider" class="com.codechronicle.storage.LocalDiskPersistentStoreProvider">
+		<constructor-arg><value>#{systemEnvironment['STORAGE_DIRECTORY']}</value></constructor-arg>
+	</bean>
 
 </beans>

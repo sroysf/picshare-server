@@ -47,4 +47,8 @@ public class EnvironmentHelper {
 				"postgres://(.*):(.*)@(.*)",
 				"jdbc:postgresql://$3?user=$1&password=$2"));
 	}
+
+	public static String getAppContextRoot() {
+		return "http://localhost:8080";
+	}
 }
