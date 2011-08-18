@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codechronicle.EnvironmentHelper;
@@ -45,13 +46,29 @@ public class RestController {
 		return book;
 	}*/
 	
-	/*@RequestMapping(method=RequestMethod.GET, value="/msg")
-	public @ResponseBody AsyncMessage getMessage () {
-		return messageQueue.dequeue("testQueue", AsyncMessage.class);
-	}*/
+	
+	@RequestMapping(method=RequestMethod.POST, value="/image")
+	public @ResponseBody Image postSingleImage (
+			@RequestParam(value="origUrl") String originalUrl, 
+			@RequestParam(value="localFile") String localFilePath,
+			@RequestParam(value="hostOriginal",required=false) boolean hostOriginal) {
+		
+		Image image = new Image();
+		image.setOriginalUrl(originalUrl);
+		image.setLocalPath(localFilePath);
+		
+		image = imageDAO.saveOrUpdate(image);
+		
+		ProcessImageMessage msg = new ProcessImageMessage();
+		msg.setImageId(image.getId());
+		msg.setHostOriginal(hostOriginal);
+		messageQueue.enqueue(EnvironmentHelper.PROCESS_IMAGE_QUEUE, msg);
+		
+		return image;
+	}
 	
 	@RequestMapping(method=RequestMethod.GET, value="/image")
-	public @ResponseBody Image postSingleImage () {
+	public @ResponseBody Image postSingleImageTest () {
 		
 		String localPath = "/tmp/DSC_6420.JPG";
 		String origUrl = "http://saptarshi.homedns.org/nas/pics/kai.jpg";
