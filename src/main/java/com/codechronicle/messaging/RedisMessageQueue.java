@@ -2,9 +2,12 @@ package com.codechronicle.messaging;
 
 import java.util.List;
 
+import org.eclipse.jetty.util.log.Log;
+
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+import redis.clients.jedis.exceptions.JedisConnectionException;
 
 public class RedisMessageQueue implements MessageQueue {
 
@@ -45,23 +48,29 @@ public class RedisMessageQueue implements MessageQueue {
 		
 		// TODO: Add reconnect capability if server closes connection due to blocking for too long
 		
-		Jedis jedis = pool.getResource();
-		try {
-
-			// This should block until data is available
-			List<String> keyValue = jedis.blpop(0, queueName);
-			if (keyValue != null) {
-				T msg = messageEncoder
-						.fromEncodedString(keyValue.get(1), clazz);
-				return msg;
+		Jedis jedis = null; 
+		do {
+			Log.info("Refreshing Redis connection...");
+			jedis = pool.getResource();
+			
+			try {
+	
+				List<String> keyValue = jedis.blpop(30, queueName);
+				if (keyValue != null) {
+					T msg = messageEncoder
+							.fromEncodedString(keyValue.get(1), clazz);
+					return msg;
+				}
+			} catch (JedisConnectionException jce) {
+				if (jce.getMessage().contains("server has closed the connection")) {
+					Log.warn("Redis server dropped blocking connection, reconnecting...");
+				}
+			} catch (Throwable t) {
+				throw new RuntimeException(t);
+			} finally {
+				pool.returnResource(jedis);
 			}
-		} catch (Throwable t) {
-			throw new RuntimeException(t);
-		} finally {
-			pool.returnResource(jedis);
-		}
-
-		return null;
+		} while (true);
 	}
 
 }
