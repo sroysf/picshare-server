@@ -20,6 +20,7 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
 
 import com.codechronicle.EnvironmentHelper;
+import com.codechronicle.HttpConnectionHelper;
 import com.codechronicle.dao.ImageDAO;
 import com.codechronicle.entity.Image;
 import com.codechronicle.messaging.MessageQueue;
@@ -31,6 +32,8 @@ public class ImagePostProcessor {
 	
 	private static ApplicationContext context = null;
 	private static Logger log = LoggerFactory.getLogger(ImagePostProcessor.class);
+	
+	private DefaultHttpClient client = new DefaultHttpClient();
 
 	@Inject
 	private ImageDAO imageDAO;
@@ -56,6 +59,13 @@ public class ImagePostProcessor {
 		
 		//imgProcessor.processImage(2l);
 		
+	}
+	
+	public ImagePostProcessor() {
+		
+		// Configure http client
+		HttpConnectionHelper.configureSecurityFromPropertyFile(client, "server.props");
+		HttpConnectionHelper.setNoSSLCertVerification(client);
 	}
 	
 	private void listenForMessages() {
@@ -205,9 +215,9 @@ public class ImagePostProcessor {
 		File tmpFile = null;
 		try {
 			URI uri = new URI(url);
-			HttpClient httpclient = new DefaultHttpClient();
+			
 			HttpGet httpget = new HttpGet(uri);
-			HttpResponse response = httpclient.execute(httpget);
+			HttpResponse response = client.execute(httpget);
 			HttpEntity entity = response.getEntity();
 			if (entity != null) {
 				do {

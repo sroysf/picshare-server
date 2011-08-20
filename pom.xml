@@ -145,9 +145,9 @@
 		
 		<!-- Http access to remote resources -->
 		<dependency>
-		    <groupId>org.apache.httpcomponents</groupId>
-		    <artifactId>httpclient</artifactId>
-		    <version>4.1.2</version>
+		    <groupId>com.codechronicle</groupId>
+		    <artifactId>http-wrapper</artifactId>
+		    <version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
 		<!-- Test only dependencies -->
