@@ -1,8 +1,15 @@
 package com.codechronicle.entity;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 @Entity
 public class Image {
@@ -11,16 +18,17 @@ public class Image {
 	@GeneratedValue
 	private Long id;
 	
-	private String localPath;
 	private String thumbUrl;
 	private String webUrl;
 	private String masterUrl;
 	
 	// This field should be indexed in the database for performance, since we frequently look things up by this.
 	private String originalUrl;
-	
+
 	private boolean postProcessed = false;
 	
+	@ManyToMany(fetch=FetchType.LAZY)
+	private Set<Tag> tags = new HashSet<Tag>();
 	
 	public Long getId() {
 		return id;
@@ -46,12 +54,6 @@ public class Image {
 	public void setOriginalUrl(String originalUrl) {
 		this.originalUrl = originalUrl;
 	}
-	public String getLocalPath() {
-		return localPath;
-	}
-	public void setLocalPath(String localPath) {
-		this.localPath = localPath;
-	}
 	public boolean isPostProcessed() {
 		return postProcessed;
 	}
@@ -64,4 +66,12 @@ public class Image {
 	public void setMasterUrl(String masterUrl) {
 		this.masterUrl = masterUrl;
 	}
+	public Set<Tag> getTags() {
+		return tags;
+	}
+	public void setTags(Set<Tag> tags) {
+		this.tags = tags;
+	}
+	
+	
 }

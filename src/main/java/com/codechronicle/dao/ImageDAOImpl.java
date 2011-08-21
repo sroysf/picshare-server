@@ -1,16 +1,23 @@
 package com.codechronicle.dao;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceException;
 import javax.persistence.Query;
 
+import org.springframework.orm.jpa.JpaCallback;
 import org.springframework.orm.jpa.support.JpaDaoSupport;
-import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.codechronicle.entity.Image;
+import com.codechronicle.entity.Tag;
 
 public class ImageDAOImpl extends JpaDaoSupport implements ImageDAO {
 
@@ -18,7 +25,7 @@ public class ImageDAOImpl extends JpaDaoSupport implements ImageDAO {
 	EntityManager em;
 	
 	@Override
-	@Transactional
+	@Transactional(propagation=Propagation.REQUIRED)
 	public Image saveOrUpdate(Image image) {
 		
 		if (image.getId() == null) {
@@ -42,5 +49,54 @@ public class ImageDAOImpl extends JpaDaoSupport implements ImageDAO {
 	@Override
 	public Image findById(long id) {
 		return getJpaTemplate().find(Image.class, id);
+	}
+	
+	@Override
+	@Transactional
+	public Image findByIdWithTags(long id) {
+		Image img = findById(id);
+		
+		// Force the load of the lazy tags collection
+		if (img != null) {
+			img.getTags().size();
+		}
+		return img;
+	}
+	
+	@Override
+	@Transactional
+	public void deleteTag(final Tag tag) {
+		
+		final Tag tagToDelete = getJpaTemplate().find(Tag.class, tag.getId());
+		
+		getJpaTemplate().execute(new JpaCallback<Integer>() {
+			@Override
+			public Integer doInJpa(EntityManager em)
+					throws PersistenceException {
+				
+				Query query = em.createNativeQuery("delete from image_tag where tags_id = :tagId");
+				query.setParameter("tagId", tagToDelete.getId());
+				return query.executeUpdate();
+			}
+		});
+		
+		getJpaTemplate().remove(tagToDelete);
+	}
+	
+	@Override
+	@Transactional(propagation=Propagation.REQUIRED)
+	public Tag findOrCreateTag(String value) {
+		
+		Map<String, String> args = new HashMap<String, String>();
+		args.put("val", value);
+		List<Tag> tags = getJpaTemplate().findByNamedParams("Select t from Tag t where value = :val", args);
+		
+		if (tags.size() > 0) {
+			return tags.get(0);
+		} else {
+			Tag tag = new Tag(value);
+			getJpaTemplate().persist(tag);
+			return tag;
+		}
 	}
 }

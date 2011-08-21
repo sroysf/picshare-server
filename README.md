@@ -26,6 +26,10 @@ Now you can run your webapp with:
 
 (the wrapper script is not executable by default).
 
+...or if you are using foreman :
+
+	$ foreman start -c imgworker=3
+
 
 # Setting up a new postgres database
 

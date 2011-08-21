@@ -19,6 +19,7 @@ import com.codechronicle.EnvironmentHelper;
 import com.codechronicle.dao.ImageDAO;
 import com.codechronicle.entity.Book;
 import com.codechronicle.entity.Image;
+import com.codechronicle.entity.Tag;
 import com.codechronicle.messaging.AsyncMessage;
 import com.codechronicle.messaging.MessageQueue;
 import com.codechronicle.messaging.ProcessImageMessage;
@@ -53,12 +54,19 @@ public class RestController {
 	 */
 	public @ResponseBody Image postSingleImage (
 			@RequestParam(value="origUrl") String originalUrl, 
-			@RequestParam(value="localFile") String localFilePath,
-			@RequestParam(value="hostOriginal",required=false) boolean hostOriginal) {
+			@RequestParam(value="hostOriginal",required=false) boolean hostOriginal,
+			@RequestParam(value="tags",required=false) String tags) {
 		
 		Image image = new Image();
 		image.setOriginalUrl(originalUrl);
-		image.setLocalPath(localFilePath);
+		
+		if ((tags != null) && (tags.length() > 0)) {
+			String[] tagArray = tags.split("\\|");
+			for (String tagStr : tagArray) {
+				Tag tag = imageDAO.findOrCreateTag(tagStr);
+				image.getTags().add(tag);
+			}
+		}
 		
 		image = imageDAO.saveOrUpdate(image);
 		

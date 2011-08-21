@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.inject.Inject;
 
@@ -18,11 +20,14 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.codechronicle.EnvironmentHelper;
 import com.codechronicle.HttpConnectionHelper;
 import com.codechronicle.dao.ImageDAO;
 import com.codechronicle.entity.Image;
+import com.codechronicle.entity.Tag;
 import com.codechronicle.messaging.MessageQueue;
 import com.codechronicle.messaging.ProcessImageMessage;
 import com.codechronicle.storage.PersistentStoreProvider;
@@ -41,6 +46,7 @@ public class ImagePostProcessor {
 	@Inject
 	MessageQueue messageQueue;
 	
+	
 	public static void main(String[] args) {
 
 		EnvironmentHelper.configureEnvironment();
@@ -49,16 +55,6 @@ public class ImagePostProcessor {
 		
 		ImagePostProcessor imgProcessor = context.getBean("imagePostProcessor", ImagePostProcessor.class);
 		imgProcessor.listenForMessages();
-		
-		/*Image image = new Image();
-		image.setOriginalUrl("http://www.citypictures.net/data/media/227/Monch_and_Eiger_Grosse_Scheidegg_Switzerland.jpg");
-		ImageDAO imgDAO = context.getBean("imageDAO", ImageDAO.class);
-		imgDAO.saveOrUpdate(image);
-		
-		*/
-		
-		//imgProcessor.processImage(2l);
-		
 	}
 	
 	public ImagePostProcessor() {
@@ -95,11 +91,7 @@ public class ImagePostProcessor {
 		
 		File srcImageFile = null;
 		
-		if ((image.getLocalPath() != null) && (image.getLocalPath().length() > 0)) {
-			srcImageFile = copyImageFromLocalFile(image.getLocalPath());
-		} else {
-			srcImageFile = copyImageFromURL(url);
-		}
+		srcImageFile = copyImageFromURL(url);
 		
 		File webImageFile = createWebImage(srcImageFile);
 		File thumbImageFile = createThumbImage(srcImageFile);
@@ -186,28 +178,6 @@ public class ImagePostProcessor {
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
 		}
-	}
-
-	private File copyImageFromLocalFile(String localPath) {
-		
-		File tmpFile = null;
-		try {
-			File srcFile = new File(localPath);
-			if (!srcFile.exists()) {
-				throw new RuntimeException("Local file not found : " + localPath);
-			}
-			
-			do {
-				tmpFile = File.createTempFile("picshare", "");
-			} while (!tmpFile.exists());
-			
-			log.info("Copying local file from " + srcFile.getAbsolutePath() + " --> " + tmpFile.getAbsolutePath());
-			FileUtils.copyFile(srcFile, tmpFile);
-		} catch (Throwable e) {
-			throw new RuntimeException(e);
-		}
-		
-		return tmpFile;
 	}
 
 	private File copyImageFromURL(String url) {
