@@ -1,10 +1,8 @@
 package com.codechronicle.dao;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -49,18 +47,6 @@ public class ImageDAOImpl extends JpaDaoSupport implements ImageDAO {
 	@Override
 	public Image findById(long id) {
 		return getJpaTemplate().find(Image.class, id);
-	}
-	
-	@Override
-	@Transactional
-	public Image findByIdWithTags(long id) {
-		Image img = findById(id);
-		
-		// Force the load of the lazy tags collection
-		if (img != null) {
-			img.getTags().size();
-		}
-		return img;
 	}
 	
 	@Override

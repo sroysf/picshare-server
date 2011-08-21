@@ -27,7 +27,13 @@ public class Image {
 
 	private boolean postProcessed = false;
 	
-	@ManyToMany(fetch=FetchType.LAZY)
+	/*
+	Setting this collection to eager for simplicity, since we'll want it most of the time anyway.
+	If performance becomes an issue, will have to optimize this better. Since we're serializing this over
+	JSON, by default this field gets accessed all the time, resulting in a lazy init exception if it's loaded
+	lazily. Ah the joys of ORM.
+	*/
+	@ManyToMany(fetch=FetchType.EAGER)
 	private Set<Tag> tags = new HashSet<Tag>();
 	
 	public Long getId() {

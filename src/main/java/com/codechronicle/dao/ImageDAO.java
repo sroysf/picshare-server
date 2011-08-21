@@ -13,8 +13,6 @@ public interface ImageDAO {
 	
 	Image findById(long id);
 	
-	Image findByIdWithTags(long id);
-	
 	void deleteTag(Tag tag);
 	
 	Tag findOrCreateTag(String value);

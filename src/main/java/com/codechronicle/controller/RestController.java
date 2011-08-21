@@ -57,6 +57,11 @@ public class RestController {
 			@RequestParam(value="hostOriginal",required=false) boolean hostOriginal,
 			@RequestParam(value="tags",required=false) String tags) {
 		
+		List<Image> existingImage = imageDAO.findByOrigUrl(originalUrl);
+		if (existingImage.size() > 0) {
+			return existingImage.get(0);
+		}
+		
 		Image image = new Image();
 		image.setOriginalUrl(originalUrl);
 		
