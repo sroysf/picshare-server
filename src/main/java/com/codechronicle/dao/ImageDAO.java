@@ -16,4 +16,8 @@ public interface ImageDAO {
 	void deleteTag(Tag tag);
 	
 	Tag findOrCreateTag(String value);
+	
+	List<Tag> getAllTags();
+	
+	List<Image> findImagesByTag(String tag);
 }

@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.net.URI;
 import java.net.URL;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.inject.Inject;
@@ -54,9 +55,29 @@ public class ImagePostProcessor {
 		context = new ClassPathXmlApplicationContext("appContext.xml");
 		
 		ImagePostProcessor imgProcessor = context.getBean("imagePostProcessor", ImagePostProcessor.class);
-		imgProcessor.listenForMessages();
+		//imgProcessor.listenForMessages();
+		//imgProcessor.testMeTag();
+		imgProcessor.testImages();
 	}
 	
+	
+	private void testImages() {
+		List<Image> images = imageDAO.findImagesByTag("/nas/media/Pictures/2011/004.Playa del Carmen");
+		for (Image image : images) {
+			System.out.println(image.getThumbUrl());
+		}
+	}
+
+
+	private void testMeTag() {
+		
+		List<Tag> tags = imageDAO.getAllTags();
+		for (Tag tag : tags) {
+			System.out.println(tag);
+		}
+	}
+
+
 	public ImagePostProcessor() {
 		
 		// Configure http client

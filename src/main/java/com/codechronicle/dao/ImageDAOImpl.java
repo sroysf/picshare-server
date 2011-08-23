@@ -85,4 +85,21 @@ public class ImageDAOImpl extends JpaDaoSupport implements ImageDAO {
 			return tag;
 		}
 	}
+	
+	@Override
+	public List<Tag> getAllTags() {
+		
+		List<Tag> tags = getJpaTemplate().find("Select t from Tag t order by t.value desc");
+		return tags;
+	}
+	
+	@Override
+	public List<Image> findImagesByTag(String tag) {
+		
+		Map<String, String> args = new HashMap<String, String>();
+		args.put("tag", tag);
+		
+		List<Image> images = getJpaTemplate().findByNamedParams("Select i from Image i join i.tags tag where tag.value = :tag", args); 
+		return images;
+	}
 }
