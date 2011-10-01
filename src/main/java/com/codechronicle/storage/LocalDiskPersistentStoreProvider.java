@@ -51,7 +51,7 @@ public class LocalDiskPersistentStoreProvider implements
 		}
 		
 		try {
-			URL url = new URL(EnvironmentHelper.getAppContextRoot() + "/static/" + targetDir.getName() + "/" + srcFile.getName());
+			URL url = new URL(EnvironmentHelper.getAppDataURLRoot() + targetDir.getName() + "/" + srcFile.getName());
 			return url;
 		} catch (MalformedURLException e) {
 			throw new RuntimeException(e);

@@ -7,11 +7,25 @@ public class EnvironmentHelper {
 	
 	public static final String PROCESS_IMAGE_QUEUE = "processImageQueue";
 	
+	private static String webServerRoot = null;
+	
 	public static void configureEnvironment() {
 
 		configurePostgres();
 		
 		configureRedis();
+		
+		configureServerRoot();
+	}
+
+	private static void configureServerRoot() {
+		
+		webServerRoot = System.getenv().get("WEB_SERVER_APPDATA_ROOT");
+		if ((webServerRoot == null) || ("".equals(webServerRoot))) {
+			throw new RuntimeException("Unable to start. Requires env var WEB_SERVER_APPDATA_ROOT to be set.");
+		}
+		
+		webServerRoot = webServerRoot + "/" + getAppDataDirName() + "/";
 	}
 
 	private static void configureRedis() {
@@ -50,7 +64,11 @@ public class EnvironmentHelper {
 				"jdbc:postgresql://$3?user=$1&password=$2"));
 	}
 
-	public static String getAppContextRoot() {
-		return "http://localhost:8080";
+	public static String getAppDataURLRoot() {
+		return webServerRoot;
+	}
+	
+	public static String getAppDataDirName() {
+		return "picshare";
 	}
 }

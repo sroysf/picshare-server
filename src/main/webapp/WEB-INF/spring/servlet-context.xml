@@ -15,12 +15,6 @@
 	<!-- Enables the Spring MVC @Controller programming model -->
 	<mvc:annotation-driven />
 	
-	<!-- Handles HTTP GET requests for /resources/** by efficiently serving up static resources in the mapped directory -->
-	<!-- TODO: How can we configure this so that the /tmp/pics directory comes from the environment variable STORAGE_DIR? 
-			   How can we setup entirely separate configuration files based on an environment variable value?
-	-->
-	<mvc:resources mapping="/static/**" location="file:/tmp/pics/" cache-period="31556926"/>
-
 	<!-- Resolves views selected for rendering by @Controllers to .jsp resources in the /WEB-INF/views directory -->
 	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
 		<property name="prefix" value="/WEB-INF/views/" />

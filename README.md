@@ -5,7 +5,7 @@
 
 # Build
 
-Build the project with
+Build the project with (after every code change)
 
     $ mvn install
 
@@ -16,7 +16,15 @@ You will need to set the `REPO` environment variable, so the execution wrapper s
     export REPO=$HOME/.m2/repository
     export DATABASE_URL='postgres://devdbuser:dbpass@localhost/devdb'
     export REDISTOGO_URL='redis://username:redispass@localhost:6379'
-    export STORAGE_DIRECTORY='/tmp/pics'
+    export STORAGE_DIRECTORY='/home/sroy/appdata/picshare'
+    export WEB_SERVER_APPDATA_ROOT='http://localhost/appdata'
+    
+# Environmental Dependencies
+
+	1. Requires an nginx mapping for appdata -> /home/sroy/appdata.  This is where all the derived assets will be stored.
+	2. Requires a Redis server installed and running with a password restriction matching the REDISTOGO url parameter above.
+	3. Requires postgres to be installed
+	4. Requires ruby and the foreman gem to be installed. (https://gist.github.com/1083861)
 
 # Run
 

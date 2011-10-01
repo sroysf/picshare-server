@@ -102,4 +102,28 @@ public class ImageDAOImpl extends JpaDaoSupport implements ImageDAO {
 		List<Image> images = getJpaTemplate().findByNamedParams("Select i from Image i join i.tags tag where tag.value = :tag", args); 
 		return images;
 	}
+	
+	@Override
+	/**
+	 * Returns a maximum of 1000 records at a time
+	 */
+	public List<Image> findImagesByProcessedStatus(final boolean status) {
+		Map<String, Boolean> args = new HashMap<String, Boolean>();
+		args.put("postProcessed", false);
+		
+		List<Image> images = getJpaTemplate().executeFind(new JpaCallback<List<Image>>() {
+			@Override
+			public List<Image> doInJpa(EntityManager em)
+					throws PersistenceException {
+				
+				Query query = em.createQuery("Select i from Image i where i.postProcessed = :postProcessed");
+				query.setParameter("postProcessed", status);
+				query.setMaxResults(1000);
+				
+				return query.getResultList();
+			}
+		});
+		
+		return images;
+	}
 }

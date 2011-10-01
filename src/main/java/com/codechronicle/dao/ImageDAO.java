@@ -20,4 +20,6 @@ public interface ImageDAO {
 	List<Tag> getAllTags();
 	
 	List<Image> findImagesByTag(String tag);
+	
+	List<Image> findImagesByProcessedStatus(boolean status);
 }

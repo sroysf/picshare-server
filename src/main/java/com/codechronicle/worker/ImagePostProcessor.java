@@ -55,13 +55,13 @@ public class ImagePostProcessor {
 		context = new ClassPathXmlApplicationContext("appContext.xml");
 		
 		ImagePostProcessor imgProcessor = context.getBean("imagePostProcessor", ImagePostProcessor.class);
-		//imgProcessor.listenForMessages();
+		imgProcessor.listenForMessages();
 		//imgProcessor.testMeTag();
-		imgProcessor.testImages();
+		//imgProcessor.testImages();
 	}
 	
 	
-	private void testImages() {
+	/*private void testImages() {
 		List<Image> images = imageDAO.findImagesByTag("/nas/media/Pictures/2011/004.Playa del Carmen");
 		for (Image image : images) {
 			System.out.println(image.getThumbUrl());
@@ -75,7 +75,7 @@ public class ImagePostProcessor {
 		for (Tag tag : tags) {
 			System.out.println(tag);
 		}
-	}
+	}*/
 
 
 	public ImagePostProcessor() {
@@ -97,6 +97,8 @@ public class ImagePostProcessor {
 	
 	private void processImage(long imageId, boolean hostOriginal) {
 
+		log.debug("Loading and processing image id = " + imageId);
+		
 		Image image = imageDAO.findById(imageId);
 		
 		if (image == null) {
@@ -195,6 +197,8 @@ public class ImagePostProcessor {
 				} else {
 					throw new Exception("Image resize failed unexpectedly. Command line = " + cmdLine);
 				}
+			} else {
+				throw new RuntimeException("Image resize failed unexpectedly. Command line = " + cmdLine);
 			}
 		} catch (Throwable e) {
 			throw new RuntimeException(e);
@@ -212,7 +216,7 @@ public class ImagePostProcessor {
 			HttpEntity entity = response.getEntity();
 			if (entity != null) {
 				do {
-					tmpFile = File.createTempFile("picshare", "");
+					tmpFile = File.createTempFile(EnvironmentHelper.getAppDataDirName(), "");
 				} while (!tmpFile.exists());
 			    InputStream instream = entity.getContent();
 			    
