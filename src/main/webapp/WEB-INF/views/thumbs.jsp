@@ -40,7 +40,7 @@ Prev | Page <INPUT id="pageNumBox" type="text" size="2" name="pageNum" onkeydown
 
         
 <c:forEach var="image" items="${ imageList }">
-	<a href="/image/web?id=<c:out value='${ image.id }'/>"><img src="<c:out value='${ image.thumbUrl }'/>"/></a>
+	<a href="/picshare/image/web?id=<c:out value='${ image.id }'/>"><img src="<c:out value='${ image.thumbUrl }'/>"/></a>
 </c:forEach>
              
 
