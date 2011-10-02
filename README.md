@@ -1,7 +1,9 @@
 # Prerequisites
 
-- Local Postgres database, with corresponding database and user account matching DATABASE_URL
-- Local Redis server, used for message queueing.
+1. Requires an nginx mapping for appdata -> /home/sroy/appdata.  This is where all the derived assets will be stored.
+2. Requires a Redis server installed and running with a password restriction matching the REDISTOGO url parameter above.
+3. Requires Postgres database to be installed
+4. Requires ruby and the foreman gem to be installed. (https://gist.github.com/1083861)
 
 # Build
 
@@ -19,24 +21,11 @@ You will need to set the `REPO` environment variable, so the execution wrapper s
     export STORAGE_DIRECTORY='/home/sroy/appdata/picshare'
     export WEB_SERVER_APPDATA_ROOT='http://localhost/appdata'
     
-# Environmental Dependencies
-
-	1. Requires an nginx mapping for appdata -> /home/sroy/appdata.  This is where all the derived assets will be stored.
-	2. Requires a Redis server installed and running with a password restriction matching the REDISTOGO url parameter above.
-	3. Requires postgres to be installed
-	4. Requires ruby and the foreman gem to be installed. (https://gist.github.com/1083861)
-
 # Run
 
 Now you can run your webapp with:
 
-    $ sh target/bin/webapp
-
-(the wrapper script is not executable by default).
-
-...or if you are using foreman :
-
-	$ foreman start -c imgworker=3
+    $ sh launch.sh
 
 
 # Setting up a new postgres database
