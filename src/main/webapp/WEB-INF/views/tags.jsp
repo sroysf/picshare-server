@@ -17,7 +17,7 @@
 <BODY>
 
 <c:forEach var="tag" items="${ tagList }">
-	<a href="/picshare/image/thumbs?tag=<c:out value='${tag.value}'/>"><c:out value='${tag.value}'/></a><br/>
+	<a href="/picshare/image/thumbs?tag=<c:out value='${tag.value}&start=0&num=25'/>"><c:out value='${tag.value}'/></a><br/>
 </c:forEach>
 
 </BODY>

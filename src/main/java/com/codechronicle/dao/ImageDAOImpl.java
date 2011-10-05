@@ -94,12 +94,26 @@ public class ImageDAOImpl extends JpaDaoSupport implements ImageDAO {
 	}
 	
 	@Override
-	public List<Image> findImagesByTag(String tag) {
+	public List<Image> findImagesByTag(final String tag, final int firstResult, final int numResults) {
 		
 		Map<String, String> args = new HashMap<String, String>();
 		args.put("tag", tag);
 		
-		List<Image> images = getJpaTemplate().findByNamedParams("Select i from Image i join i.tags tag where tag.value = :tag", args); 
+		//List<Image> images = getJpaTemplate().findByNamedParams("Select i from Image i join i.tags tag where tag.value = :tag", args);
+		List<Image> images = getJpaTemplate().executeFind(new JpaCallback<List<Image>>() {
+			@Override
+			public List<Image> doInJpa(EntityManager em)
+					throws PersistenceException {
+				
+				Query query = em.createQuery("Select i from Image i join i.tags tag where tag.value = :tag");
+				query.setParameter("tag", tag);
+				query.setFirstResult(firstResult);
+				query.setMaxResults(numResults);
+				
+				return query.getResultList();
+			}
+		});
+		
 		return images;
 	}
 	

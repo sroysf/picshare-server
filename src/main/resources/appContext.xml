@@ -45,5 +45,7 @@
 	</bean>
 	
 	<bean id="imagePostProcessor" class="com.codechronicle.worker.ImagePostProcessor"/>
+	
+	<bean id="tester" class="com.codechronicle.worker.Tester"/>
 
 </beans>

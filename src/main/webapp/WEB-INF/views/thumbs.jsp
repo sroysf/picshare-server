@@ -11,38 +11,45 @@
 <HEAD>
 	<c:set var="foo" scope="session" value="5"/>  
    <TITLE>Simple UI <c:out value="${foo}"/></TITLE>
-   
-   <script language="Javascript">
-   		function onFormKey(event) {
-   			if (event.keyCode == 13) {
-   				var i = document.getElementById('pageNumBox').value;
-   				alert('Enter Pressed : ' + i);
-   			}
-   		}
-   </script>
 </HEAD>
 <BODY>
 
 <h3><c:out value="${ tag }"/></h3>
 
-<FORM>
-Thumbnails per page:
-<select id="numPerPagePulldown" name="numPerPage">
-	<option value="10">10</option>
-	<option value="25">25</option>
-	<option value="50" selected="true">50</option>
-</select>
-
+<a href="/picshare/">Home</a>
+<br/>
 <br/>
 
-Prev | Page <INPUT id="pageNumBox" type="text" size="2" name="pageNum" onkeydown="onFormKey(event)"/> of 25 | Next  <br/>
-</FORM>
+<c:if test='${prevDisabled == false}'>
+	<a href="/picshare/image/thumbs?tag=<c:out value='${tag}'/>&start=<c:out value='${prevStart}'/>&num=25">Previous Page</a>     
+</c:if>
 
-        
+<c:if test='${(prevDisabled == false) && (nextDisabled == false)}'>
+&nbsp;&nbsp;|&nbsp;&nbsp;
+</c:if>
+
+<c:if test='${nextDisabled == false}'>
+<a href="/picshare/image/thumbs?tag=<c:out value='${tag}'/>&start=<c:out value='${nextStart}'/>&num=25">Next Page</a>
+</c:if>
+
+<br/>
+<br/>
+       
 <c:forEach var="image" items="${ imageList }">
 	<a href="/picshare/image/web?id=<c:out value='${ image.id }'/>"><img src="<c:out value='${ image.thumbUrl }'/>"/></a>
 </c:forEach>
-             
+
+<br/>
+<br/>
+
+
+<c:if test='${prevDisabled == false}'>
+	<a href="/picshare/image/thumbs?tag=<c:out value='${tag}'/>&start=<c:out value='${prevStart}'/>&num=25">Previous Page</a> |     
+</c:if>
+
+<c:if test='${nextDisabled == false}'>
+<a href="/picshare/image/thumbs?tag=<c:out value='${tag}'/>&start=<c:out value='${nextStart}'/>&num=25">Next Page</a>
+</c:if>             
 
 </BODY>
 

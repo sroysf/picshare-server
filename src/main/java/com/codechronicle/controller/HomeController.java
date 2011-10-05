@@ -46,13 +46,32 @@ public class HomeController {
 	}
 	
 	@RequestMapping(method=RequestMethod.GET, value="/image/thumbs")
-	public String getThumbs(@RequestParam(value="tag")String tag, Map<String, Object> model) {
+	public String getThumbs(@RequestParam(value="tag")String tag, @RequestParam(value="start")int startNum, 
+			@RequestParam(value="num")int numRecords, Map<String, Object> model) {
 		
 		log.info("Loading thumbnails for tag : " + tag);
 		model.put("tag", tag);
 		
-		List<Image> imageList = imageDAO.findImagesByTag(tag);
+		List<Image> imageList = imageDAO.findImagesByTag(tag, startNum, numRecords);
 		model.put("imageList", imageList);
+		
+		int nextStart = startNum + 25;
+		int prevStart = startNum - 25;
+		boolean prevDisabled = false;
+		boolean nextDisabled = false;
+		
+		if (prevStart < 0) {
+			prevDisabled = true;
+		}
+		
+		if (imageList.size() < 25) {
+			nextDisabled = true;
+		}
+		
+		model.put("nextStart", nextStart);
+		model.put("prevStart", prevStart);
+		model.put("prevDisabled", prevDisabled);
+		model.put("nextDisabled", nextDisabled);
 		
 		return "thumbs";
 	}
