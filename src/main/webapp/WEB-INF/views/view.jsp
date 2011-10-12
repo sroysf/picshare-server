@@ -3,7 +3,7 @@
 
 <jsp:useBean id="image"
              scope="request"
-             type="com.codechronicle.entity.Image" />
+             type="com.codechronicle.picshare.server.entity.Image" />
     
 <HTML>
 <HEAD>

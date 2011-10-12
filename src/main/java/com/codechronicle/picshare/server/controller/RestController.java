@@ -1,4 +1,4 @@
-package com.codechronicle.controller;
+package com.codechronicle.picshare.server.controller;
 
 import java.util.List;
 
@@ -15,14 +15,14 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.codechronicle.EnvironmentHelper;
-import com.codechronicle.dao.ImageDAO;
-import com.codechronicle.entity.Book;
-import com.codechronicle.entity.Image;
-import com.codechronicle.entity.Tag;
-import com.codechronicle.messaging.AsyncMessage;
-import com.codechronicle.messaging.MessageQueue;
-import com.codechronicle.messaging.ProcessImageMessage;
+import com.codechronicle.picshare.server.EnvironmentHelper;
+import com.codechronicle.picshare.server.dao.ImageDAO;
+import com.codechronicle.picshare.server.entity.Book;
+import com.codechronicle.picshare.server.entity.Image;
+import com.codechronicle.picshare.server.entity.Tag;
+import com.codechronicle.picshare.server.messaging.AsyncMessage;
+import com.codechronicle.picshare.server.messaging.MessageQueue;
+import com.codechronicle.picshare.server.messaging.ProcessImageMessage;
 
 @Controller
 @RequestMapping(value="/rest")

@@ -1,4 +1,4 @@
-package com.codechronicle.entity;
+package com.codechronicle.picshare.server.entity;
 
 public class Book {
 	private String name;

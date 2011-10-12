@@ -1,4 +1,4 @@
-package com.codechronicle.dao;
+package com.codechronicle.picshare.server.dao;
 
 import java.util.HashMap;
 import java.util.List;
@@ -14,8 +14,8 @@ import org.springframework.orm.jpa.support.JpaDaoSupport;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.codechronicle.entity.Image;
-import com.codechronicle.entity.Tag;
+import com.codechronicle.picshare.server.entity.Image;
+import com.codechronicle.picshare.server.entity.Tag;
 
 public class ImageDAOImpl extends JpaDaoSupport implements ImageDAO {
 

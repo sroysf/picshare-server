@@ -1,9 +1,9 @@
-package com.codechronicle.dao;
+package com.codechronicle.picshare.server.dao;
 
 import java.util.List;
 
-import com.codechronicle.entity.Image;
-import com.codechronicle.entity.Tag;
+import com.codechronicle.picshare.server.entity.Image;
+import com.codechronicle.picshare.server.entity.Tag;
 
 public interface ImageDAO {
 	

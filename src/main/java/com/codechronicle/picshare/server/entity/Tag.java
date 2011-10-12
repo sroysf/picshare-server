@@ -1,4 +1,4 @@
-package com.codechronicle.entity;
+package com.codechronicle.picshare.server.entity;
 
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;

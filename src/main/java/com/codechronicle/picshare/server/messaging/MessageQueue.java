@@ -1,4 +1,4 @@
-package com.codechronicle.messaging;
+package com.codechronicle.picshare.server.messaging;
 
 public interface MessageQueue {
 

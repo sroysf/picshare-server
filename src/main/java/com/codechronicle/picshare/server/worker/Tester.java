@@ -1,4 +1,4 @@
-package com.codechronicle.worker;
+package com.codechronicle.picshare.server.worker;
 
 import java.io.File;
 import java.io.InputStream;
@@ -26,14 +26,14 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import com.codechronicle.EnvironmentHelper;
 import com.codechronicle.HttpConnectionHelper;
-import com.codechronicle.dao.ImageDAO;
-import com.codechronicle.entity.Image;
-import com.codechronicle.entity.Tag;
-import com.codechronicle.messaging.MessageQueue;
-import com.codechronicle.messaging.ProcessImageMessage;
-import com.codechronicle.storage.PersistentStoreProvider;
+import com.codechronicle.picshare.server.EnvironmentHelper;
+import com.codechronicle.picshare.server.dao.ImageDAO;
+import com.codechronicle.picshare.server.entity.Image;
+import com.codechronicle.picshare.server.entity.Tag;
+import com.codechronicle.picshare.server.messaging.MessageQueue;
+import com.codechronicle.picshare.server.messaging.ProcessImageMessage;
+import com.codechronicle.picshare.server.storage.PersistentStoreProvider;
 
 @Service
 public class Tester {

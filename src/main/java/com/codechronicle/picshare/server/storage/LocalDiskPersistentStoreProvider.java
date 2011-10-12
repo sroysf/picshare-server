@@ -1,4 +1,4 @@
-package com.codechronicle.storage;
+package com.codechronicle.picshare.server.storage;
 
 import java.io.File;
 import java.io.IOException;
@@ -8,7 +8,7 @@ import java.net.URL;
 
 import org.apache.commons.io.FileUtils;
 
-import com.codechronicle.EnvironmentHelper;
+import com.codechronicle.picshare.server.EnvironmentHelper;
 
 public class LocalDiskPersistentStoreProvider implements
 		PersistentStoreProvider {

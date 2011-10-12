@@ -182,11 +182,11 @@
                     <generateRepository>false</generateRepository>
                     <programs>
                         <program>
-                            <mainClass>com.codechronicle.Main</mainClass>
+                            <mainClass>com.codechronicle.picshare.server.Main</mainClass>
                             <name>webapp</name>
                         </program>
                         <program>
-                            <mainClass>com.codechronicle.worker.ImagePostProcessor</mainClass>
+                            <mainClass>com.codechronicle.picshare.server.worker.ImagePostProcessor</mainClass>
                             <name>imageWorker</name>
                         </program>
                     </programs>

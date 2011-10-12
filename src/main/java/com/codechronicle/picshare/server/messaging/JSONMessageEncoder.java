@@ -1,4 +1,4 @@
-package com.codechronicle.messaging;
+package com.codechronicle.picshare.server.messaging;
 
 import org.codehaus.jackson.map.ObjectMapper;
 
@@ -7,7 +7,7 @@ public class JSONMessageEncoder implements MessageEncoder {
 	private ObjectMapper mapper = new ObjectMapper();
 	
 	/* (non-Javadoc)
-	 * @see com.codechronicle.messaging.MessageEncoder#toEncodedString(java.lang.Object)
+	 * @see com.codechronicle.picshare.server.messaging.MessageEncoder#toEncodedString(java.lang.Object)
 	 */
 	@Override
 	public String toEncodedString(Object obj) {
@@ -23,7 +23,7 @@ public class JSONMessageEncoder implements MessageEncoder {
 	}
 	
 	/* (non-Javadoc)
-	 * @see com.codechronicle.messaging.MessageEncoder#fromEncodedString(java.lang.String, java.lang.Class)
+	 * @see com.codechronicle.picshare.server.messaging.MessageEncoder#fromEncodedString(java.lang.String, java.lang.Class)
 	 */
 	@Override
 	public <T> T fromEncodedString(String encodedMsg, Class<T> clazz) {

@@ -1,4 +1,4 @@
-package com.codechronicle.storage;
+package com.codechronicle.picshare.server.storage;
 
 import java.io.File;
 import java.net.URL;
