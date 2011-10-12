@@ -47,6 +47,17 @@ public class RestController {
 		return book;
 	}*/
 	
+	@RequestMapping(method=RequestMethod.GET, value="/image/{id}")
+	public @ResponseBody Image getImageInfoById(@PathVariable(value="id") Long id) {
+		return imageDAO.findById(id);
+	}
+	
+	@RequestMapping(method=RequestMethod.GET, value="/image")
+	public @ResponseBody List<Image> getImageInfoByTag(@RequestParam(value="tag") String tag,
+			@RequestParam(value="start") int start,
+			@RequestParam(value="num") int num) {
+		return imageDAO.findImagesByTag(tag, start, num);
+	}
 	
 	@RequestMapping(method=RequestMethod.POST, value="/image")
 	/**

@@ -91,7 +91,13 @@ public class ImagePostProcessor {
 			i++;
 			ProcessImageMessage msg = messageQueue.dequeue(EnvironmentHelper.PROCESS_IMAGE_QUEUE, ProcessImageMessage.class);
 			log.info("Got message #" + i + ", image id = " + msg.getImageId());
-			processImage(msg.getImageId(), msg.isHostOriginal());
+			
+			try {
+				processImage(msg.getImageId(), msg.isHostOriginal());
+			} catch (Exception ex) {
+				log.warn("Unexpected exception", ex);
+				log.info("Skipping message and continuing processing...");
+			}
 		}
 	}
 	
