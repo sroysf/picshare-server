@@ -4,7 +4,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.Resource;
-import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -12,9 +14,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.ModelAndView;
 
-import com.codechronicle.picshare.server.dao.ImageDAO;
 import com.codechronicle.picshare.server.entity.Image;
 import com.codechronicle.picshare.server.entity.Tag;
 import com.codechronicle.picshare.server.messaging.MessageQueue;
@@ -25,11 +25,11 @@ public class HomeController {
 	
 	private static Logger log = LoggerFactory.getLogger(HomeController.class);
 
-	@Inject
-	private ImageDAO imageDAO;
-	
 	@Resource(name="messageQueue")	
 	private MessageQueue messageQueue;
+	
+	@PersistenceContext
+	EntityManager em;
 	
 	@RequestMapping(method=RequestMethod.GET, value="/test/form")
 	public String getTestForm() {
@@ -39,7 +39,7 @@ public class HomeController {
 	@RequestMapping(method=RequestMethod.GET, value="/")
 	public String getTags(Map<String, Object> model) {
 		
-		List<Tag> tagList = imageDAO.getAllTags();
+		List<Tag> tagList = em.createQuery("Select t from Tag t order by t.value desc").getResultList();
 		model.put("tagList", tagList);
 		
 		return "tags";
@@ -52,7 +52,7 @@ public class HomeController {
 		log.info("Loading thumbnails for tag : " + tag);
 		model.put("tag", tag);
 		
-		List<Image> imageList = imageDAO.findImagesByTag(tag, startNum, numRecords);
+		List<Image> imageList = findImagesByTag(tag, startNum, numRecords);
 		model.put("imageList", imageList);
 		
 		int nextStart = startNum + 25;
@@ -76,10 +76,20 @@ public class HomeController {
 		return "thumbs";
 	}
 	
+	private List<Image> findImagesByTag(String tag, int startNum, int numRecords) {
+		
+		Query query = em.createQuery("Select i from Image i join i.tags tag where tag.value = :tag");
+		query.setParameter("tag", tag);
+		query.setFirstResult(startNum);
+		query.setMaxResults(numRecords);
+		
+		return query.getResultList();
+	}
+
 	@RequestMapping(method=RequestMethod.GET, value="/image/web")
 	public String getThumbs(@RequestParam(value="id")Long id, Map<String, Object> model) {
 		
-		Image image = imageDAO.findById(id);
+		Image image = em.find(Image.class, id);
 		model.put("image", image);
 		
 		return "view";

@@ -30,8 +30,6 @@
      
     <bean class="org.springframework.orm.jpa.support.PersistenceAnnotationBeanPostProcessor" />
 	
-	<bean id="imageDAO" class="com.codechronicle.picshare.server.dao.ImageDAOImpl"/>
-	
 	<!-- Message queue configuration -->
 	<bean id="messageEncoder" class="com.codechronicle.picshare.server.messaging.JSONMessageEncoder"/>
 	<bean id="messageQueue" class="com.codechronicle.picshare.server.messaging.RedisMessageQueue" />
@@ -44,8 +42,12 @@
 		<constructor-arg><value>#{systemEnvironment['STORAGE_DIRECTORY']}</value></constructor-arg>
 	</bean>
 	
-	<bean id="imagePostProcessor" class="com.codechronicle.picshare.server.worker.ImagePostProcessor"/>
+	<bean id="imagePostProcessor" class="com.codechronicle.picshare.server.worker.ImagePostProcessorImpl"/>
 	
 	<bean id="tester" class="com.codechronicle.picshare.server.worker.Tester"/>
+	
+	<bean id="messageQueueListener" class="com.codechronicle.picshare.server.worker.MessageQueueListenerImpl"/>
+	
+	<bean id="failedProcessingSweeper" class="com.codechronicle.picshare.server.tools.FailedProcessingSweeperImpl"/>
 
 </beans>

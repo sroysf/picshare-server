@@ -1,39 +1,23 @@
 package com.codechronicle.picshare.server.worker;
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.URI;
-import java.net.URL;
-import java.util.HashSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import javax.inject.Inject;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 
-import org.apache.commons.io.FileUtils;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.RequestParam;
 
-import com.codechronicle.HttpConnectionHelper;
 import com.codechronicle.picshare.server.EnvironmentHelper;
-import com.codechronicle.picshare.server.dao.ImageDAO;
 import com.codechronicle.picshare.server.entity.Image;
-import com.codechronicle.picshare.server.entity.Tag;
 import com.codechronicle.picshare.server.messaging.MessageQueue;
-import com.codechronicle.picshare.server.messaging.ProcessImageMessage;
-import com.codechronicle.picshare.server.storage.PersistentStoreProvider;
 
 @Service
 public class Tester {
@@ -44,11 +28,10 @@ public class Tester {
 	private DefaultHttpClient client = new DefaultHttpClient();
 
 	@Inject
-	private ImageDAO imageDAO;
-	
-	@Inject
 	MessageQueue messageQueue;
 	
+	@PersistenceContext
+	EntityManager em;
 	
 	public static void main(String[] args) {
 
@@ -62,13 +45,15 @@ public class Tester {
 
 
 	private void doTest() {
-		String tag = "/nas/media/Pictures/2010/120.National Parks Tour";
-		
-		List<Image> imageList = imageDAO.findImagesByTag(tag, 50, 10);
-		System.out.println("Length = " + imageList.size());
-		
-		for (Image image : imageList) {
-			System.out.println(image.getId());
+		String idlist = "32579,32584,32588";
+		String[] ids = idlist.split(",");
+		List<Long> numericIdList = new ArrayList<Long>();
+		for (String id : ids) {
+			numericIdList.add(Long.parseLong(id));
 		}
+		
+		Query query = em.createQuery("select i from Image i where i.id IN (:ids)").setParameter("ids", numericIdList);
+		List<Image> images = query.getResultList();
+		System.out.println(images);
 	}
 }

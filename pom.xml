@@ -1,44 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.codechronicle</groupId>
-    <version>1.0-SNAPSHOT</version>
-    <name>picshare-server</name>
-    <artifactId>picshare-server</artifactId>
-    <packaging>jar</packaging>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.codechronicle</groupId>
+	<version>1.0-SNAPSHOT</version>
+	<name>picshare-server</name>
+	<artifactId>picshare-server</artifactId>
+	<packaging>jar</packaging>
 
-    <properties>
-        <java.version>1.6</java.version>
-        <jetty.version>7.4.4.v20110707</jetty.version>
-        <org.slf4j-version>1.5.10</org.slf4j-version>
+	<properties>
+		<java.version>1.6</java.version>
+		<jetty.version>7.4.4.v20110707</jetty.version>
+		<org.slf4j-version>1.5.10</org.slf4j-version>
 		<org.springframework-version>3.0.5.RELEASE</org.springframework-version>
-    </properties>
+	</properties>
 
-    <dependencies>
+	<dependencies>
 
-        <!-- Jetty -->
-        <dependency>
-            <groupId>org.eclipse.jetty</groupId>
-            <artifactId>jetty-webapp</artifactId>
-            <version>${jetty.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jsp-2.1-glassfish</artifactId>
-            <version>2.1.v20100127</version>
-        </dependency>
-        
-        <!--  Persistence and Queueing -->
-        <dependency>
+		<!-- Jetty -->
+		<dependency>
+			<groupId>org.eclipse.jetty</groupId>
+			<artifactId>jetty-webapp</artifactId>
+			<version>${jetty.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mortbay.jetty</groupId>
+			<artifactId>jsp-2.1-glassfish</artifactId>
+			<version>2.1.v20100127</version>
+		</dependency>
+
+		<!-- Persistence and Queueing -->
+		<dependency>
 			<groupId>postgresql</groupId>
 			<artifactId>postgresql</artifactId>
 			<version>8.4-702.jdbc4</version>
 		</dependency>
-		
+
 		<dependency>
-		    <groupId>redis.clients</groupId>
-		    <artifactId>jedis</artifactId>
-		    <version>2.0.0</version>
+			<groupId>redis.clients</groupId>
+			<artifactId>jedis</artifactId>
+			<version>2.0.0</version>
 		</dependency>
 
 		<dependency>
@@ -70,7 +71,12 @@
 			<artifactId>spring-orm</artifactId>
 			<version>${org.springframework-version}</version>
 		</dependency>
-		
+		<dependency>
+			<groupId>cglib</groupId>
+			<artifactId>cglib</artifactId>
+			<version>2.2.2</version>
+		</dependency>
+
 		<!-- @Inject -->
 		<dependency>
 			<groupId>javax.inject</groupId>
@@ -142,12 +148,12 @@
 			</exclusions>
 			<scope>runtime</scope>
 		</dependency>
-		
+
 		<!-- Http access to remote resources -->
 		<dependency>
-		    <groupId>com.codechronicle</groupId>
-		    <artifactId>http-wrapper</artifactId>
-		    <version>0.0.1-SNAPSHOT</version>
+			<groupId>com.codechronicle</groupId>
+			<artifactId>http-wrapper</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
 
 		<!-- Test only dependencies -->
@@ -156,53 +162,54 @@
 			<artifactId>junit</artifactId>
 			<version>4.5</version>
 			<scope>test</scope>
-		</dependency>		
+		</dependency>
 
-    </dependencies>
+	</dependencies>
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.3.2</version>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.2</version>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
 
-            <!-- The maven app assembler plugin will generate a script that sets up the classpath and runs your project -->
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>appassembler-maven-plugin</artifactId>
-                <version>1.1.1</version>
-                <configuration>
-                    <assembleDirectory>target</assembleDirectory> 
-                    <generateRepository>false</generateRepository>
-                    <programs>
-                        <program>
-                            <mainClass>com.codechronicle.picshare.server.Main</mainClass>
-                            <name>webapp</name>
-                        </program>
-                        <program>
-                            <mainClass>com.codechronicle.picshare.server.worker.ImagePostProcessor</mainClass>
-                            <name>imageWorker</name>
-                        </program>
-                    </programs>
-                </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>assemble</goal>
-                        </goals>
-                    </execution>				
-                </executions>
-            </plugin>
-            
-            <!-- Hibernate plugin to assist in schema generation -->
-            <plugin>
+			<!-- The maven app assembler plugin will generate a script that sets up 
+				the classpath and runs your project -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>appassembler-maven-plugin</artifactId>
+				<version>1.1.1</version>
+				<configuration>
+					<assembleDirectory>target</assembleDirectory>
+					<generateRepository>false</generateRepository>
+					<programs>
+						<program>
+							<mainClass>com.codechronicle.picshare.server.Main</mainClass>
+							<name>webapp</name>
+						</program>
+						<program>
+							<mainClass>com.codechronicle.picshare.server.worker.MessageQueueListenerImpl</mainClass>
+							<name>messageQueueListener</name>
+						</program>
+					</programs>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>assemble</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+
+			<!-- Hibernate plugin to assist in schema generation -->
+			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>hibernate3-maven-plugin</artifactId>
 				<version>2.2</version>
@@ -231,6 +238,6 @@
 					</dependency>
 				</dependencies>
 			</plugin>
-        </plugins>
-    </build>
+		</plugins>
+	</build>
 </project>

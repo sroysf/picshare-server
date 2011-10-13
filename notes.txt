@@ -2,3 +2,6 @@ Example for worker threads:
 
 https://github.com/jsimone/ProcessModelDemo/blob/master/pom.xml
 
+
+log4j configuration getting picked up from other dependencies. Changes don't appear to be affecting foreman. 
+	- But why? What's different in Eclipse?
