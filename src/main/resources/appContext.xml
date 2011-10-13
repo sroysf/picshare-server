@@ -49,5 +49,7 @@
 	<bean id="messageQueueListener" class="com.codechronicle.picshare.server.worker.MessageQueueListenerImpl"/>
 	
 	<bean id="failedProcessingSweeper" class="com.codechronicle.picshare.server.tools.FailedProcessingSweeperImpl"/>
+	
+	<bean id="txDao" class="com.codechronicle.picshare.server.dao.TransactionalDAOImpl"/>
 
 </beans>

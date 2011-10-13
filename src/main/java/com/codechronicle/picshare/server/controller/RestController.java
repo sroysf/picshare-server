@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.Resource;
+import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.codechronicle.picshare.server.EnvironmentHelper;
+import com.codechronicle.picshare.server.dao.TransactionalDAO;
 import com.codechronicle.picshare.server.entity.Image;
 import com.codechronicle.picshare.server.entity.Tag;
 import com.codechronicle.picshare.server.messaging.MessageQueue;
@@ -35,6 +37,9 @@ public class RestController {
 	
 	@PersistenceContext
 	EntityManager em;
+	
+	@Inject
+	TransactionalDAO txDao;
 	
 	/*@RequestMapping(method=RequestMethod.GET, value="/book/{bookId}")
 	public @ResponseBody Book getBook (@PathVariable(value="bookId") long bookId, Model model) {
@@ -73,7 +78,6 @@ public class RestController {
 		return em.createQuery("Select i from Image i join i.tags tag where tag.value = :tag").setParameter("tag", tag).getResultList();
 	}
 	
-	@Transactional
 	@RequestMapping(method=RequestMethod.POST, value="/image")
 	/**
 	 * This can be exercised by hitting /test/form.
@@ -92,6 +96,23 @@ public class RestController {
 			return existingImage.get(0);
 		}
 		
+		/**
+		 * This needs to be separated out so that we are sure that the record is committed
+		 * to the database BEFORE we send the message. Otherwise we'll have a race condition
+		 * and the message will likely try to get processed before the record has been committed.
+		 */
+		Image image = saveImageRecordInDatabase(originalUrl, tags);
+		
+		// Now send the message.
+		ProcessImageMessage msg = new ProcessImageMessage();
+		msg.setImageId(image.getId());
+		msg.setHostOriginal(hostOriginal);
+		messageQueue.enqueue(EnvironmentHelper.PROCESS_IMAGE_QUEUE, msg);
+		
+		return image;
+	}
+
+	public Image saveImageRecordInDatabase(String originalUrl, String tags) {
 		Image image = new Image();
 		image.setOriginalUrl(originalUrl);
 		
@@ -103,17 +124,10 @@ public class RestController {
 			}
 		}
 		
-		em.persist(image);
-		
-		ProcessImageMessage msg = new ProcessImageMessage();
-		msg.setImageId(image.getId());
-		msg.setHostOriginal(hostOriginal);
-		messageQueue.enqueue(EnvironmentHelper.PROCESS_IMAGE_QUEUE, msg);
-		
+		txDao.saveOrUpdateImage(image);
 		return image;
 	}
 
-	@Transactional
 	private Tag findOrCreateTag(String tagStr) {
 		Query query = em.createQuery("Select t from Tag t where value = :tag").setParameter("tag", tagStr);
 		List<Tag> tags = query.getResultList();
@@ -122,7 +136,7 @@ public class RestController {
 			return tags.get(0);
 		} else {
 			Tag tag = new Tag(tagStr);
-			em.persist(tag);
+			txDao.saveOrUpdateTag(tag);
 			return tag;
 		}
 	}

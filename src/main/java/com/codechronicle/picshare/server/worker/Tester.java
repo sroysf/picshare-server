@@ -45,15 +45,5 @@ public class Tester {
 
 
 	private void doTest() {
-		String idlist = "32579,32584,32588";
-		String[] ids = idlist.split(",");
-		List<Long> numericIdList = new ArrayList<Long>();
-		for (String id : ids) {
-			numericIdList.add(Long.parseLong(id));
-		}
-		
-		Query query = em.createQuery("select i from Image i where i.id IN (:ids)").setParameter("ids", numericIdList);
-		List<Image> images = query.getResultList();
-		System.out.println(images);
 	}
 }

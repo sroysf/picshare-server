@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
  */
 public interface ImagePostProcessor {
 
-	@Transactional
 	void processImage(long imageId, boolean hostOriginal);
 
 }
